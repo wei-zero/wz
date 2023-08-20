@@ -1,4 +1,4 @@
-package ossstorage
+package osscfs
 
 import (
 	"time"

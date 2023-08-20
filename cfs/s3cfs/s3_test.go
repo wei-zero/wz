@@ -1,4 +1,4 @@
-package s3storage
+package s3cfs
 
 import (
 	"context"

@@ -1,11 +1,12 @@
-package ossstorage
+package osscfs
 
 import (
-	"github.com/joho/godotenv"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/joho/godotenv"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestOssService_PutObject(t *testing.T) {
