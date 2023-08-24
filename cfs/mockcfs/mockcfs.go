@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/wei-zero/wz/cfs"
@@ -30,7 +31,8 @@ func (s *mockCloudFileStorage) DeleteObjects(bucket string, keys []string) error
 
 // GetObject implements cfs.CloudFileStorage.
 func (s *mockCloudFileStorage) GetObject(bucket string, key string, file string) error {
-	source, err := os.Open(fmt.Sprintf("%s/%s/%s", s.root, bucket, key))
+	dstFilePath := filepath.Join(s.root, bucket, key)
+	source, err := os.Open(dstFilePath)
 	if err != nil {
 		return err
 	}
@@ -52,7 +54,12 @@ func (s *mockCloudFileStorage) PutObject(bucket string, key string, file string,
 		return err
 	}
 
-	dest, err := os.Create(fmt.Sprintf("%s/%s/%s", s.root, bucket, key))
+	dstFilePath := filepath.Join(s.root, bucket, key)
+	dstDir := filepath.Dir(dstFilePath)
+	if err := os.MkdirAll(dstDir, 0755); err != nil {
+		return err
+	}
+	dest, err := os.Create(dstFilePath)
 	if err != nil {
 		return err
 	}
@@ -64,7 +71,8 @@ func (s *mockCloudFileStorage) PutObject(bucket string, key string, file string,
 
 // SignGetObjectURL implements cfs.CloudFileStorage.
 func (s *mockCloudFileStorage) SignGetObjectURL(bucket string, key string, dur time.Duration) (string, error) {
-	return fmt.Sprintf("%s/%s/%s", s.root, bucket, key), nil
+	dstFilePath := filepath.Join(s.root, bucket, key)
+	return dstFilePath, nil
 }
 
 // SignPutObjectURL implements cfs.CloudFileStorage.
@@ -72,6 +80,10 @@ func (s *mockCloudFileStorage) SignPutObjectURL(bucket string, key string, dur t
 	panic("unimplemented")
 }
 
-func New(root string) (cfs.CloudFileStorage, error) {
+func New() (cfs.CloudFileStorage, error) {
+	root := os.Expand("$HOME/.mockcfs", os.Getenv)
+	if err := os.MkdirAll(root, 0755); err != nil {
+		return nil, err
+	}
 	return &mockCloudFileStorage{root: root}, nil
 }
