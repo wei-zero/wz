@@ -10,17 +10,18 @@ import (
 )
 
 type mockCloudFileStorage struct {
+	root string
 }
 
 // DeleteObject implements cfs.CloudFileStorage.
-func (*mockCloudFileStorage) DeleteObject(bucket string, key string) error {
-	return os.Remove(fmt.Sprintf("%s/%s", bucket, key))
+func (s *mockCloudFileStorage) DeleteObject(bucket string, key string) error {
+	return os.Remove(fmt.Sprintf("%s/%s/%s", s.root, bucket, key))
 }
 
 // DeleteObjects implements cfs.CloudFileStorage.
-func (*mockCloudFileStorage) DeleteObjects(bucket string, keys []string) error {
+func (s *mockCloudFileStorage) DeleteObjects(bucket string, keys []string) error {
 	for _, key := range keys {
-		if err := os.Remove(fmt.Sprintf("%s/%s", bucket, key)); err != nil {
+		if err := os.Remove(fmt.Sprintf("%s/%s/%s", s.root, bucket, key)); err != nil {
 			return err
 		}
 	}
@@ -28,8 +29,8 @@ func (*mockCloudFileStorage) DeleteObjects(bucket string, keys []string) error {
 }
 
 // GetObject implements cfs.CloudFileStorage.
-func (*mockCloudFileStorage) GetObject(bucket string, key string, file string) error {
-	source, err := os.Open(fmt.Sprintf("%s/%s", bucket, key))
+func (s *mockCloudFileStorage) GetObject(bucket string, key string, file string) error {
+	source, err := os.Open(fmt.Sprintf("%s/%s/%s", s.root, bucket, key))
 	if err != nil {
 		return err
 	}
@@ -45,13 +46,13 @@ func (*mockCloudFileStorage) GetObject(bucket string, key string, file string) e
 }
 
 // PutObject implements cfs.CloudFileStorage.
-func (*mockCloudFileStorage) PutObject(bucket string, key string, file string, contentType string) error {
+func (s *mockCloudFileStorage) PutObject(bucket string, key string, file string, contentType string) error {
 	source, err := os.Open(file)
 	if err != nil {
 		return err
 	}
 
-	dest, err := os.Create(fmt.Sprintf("%s/%s", bucket, key))
+	dest, err := os.Create(fmt.Sprintf("%s/%s/%s", s.root, bucket, key))
 	if err != nil {
 		return err
 	}
@@ -62,15 +63,15 @@ func (*mockCloudFileStorage) PutObject(bucket string, key string, file string, c
 }
 
 // SignGetObjectURL implements cfs.CloudFileStorage.
-func (*mockCloudFileStorage) SignGetObjectURL(bucket string, key string, dur time.Duration) (string, error) {
-	panic("unimplemented")
+func (s *mockCloudFileStorage) SignGetObjectURL(bucket string, key string, dur time.Duration) (string, error) {
+	return fmt.Sprintf("%s/%s/%s", s.root, bucket, key), nil
 }
 
 // SignPutObjectURL implements cfs.CloudFileStorage.
-func (*mockCloudFileStorage) SignPutObjectURL(bucket string, key string, dur time.Duration, contentType string) (*cfs.PresignedURL, error) {
+func (s *mockCloudFileStorage) SignPutObjectURL(bucket string, key string, dur time.Duration, contentType string) (*cfs.PresignedURL, error) {
 	panic("unimplemented")
 }
 
-func New() (cfs.CloudFileStorage, error) {
-	return &mockCloudFileStorage{}, nil
+func New(root string) (cfs.CloudFileStorage, error) {
+	return &mockCloudFileStorage{root: root}, nil
 }
