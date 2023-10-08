@@ -48,11 +48,13 @@ func (c *Client) doRequest(path string, method string, req any, v any) *Error {
 	if err != nil {
 		return &Error{StatusCode: 0, ErrCode: ErrCodeNetwork, Message: err.Error()}
 	}
-
 	var buf = new(bytes.Buffer)
 	io.Copy(buf, res.Body)
 	defer func() {
-		fmt.Printf("%s: %s, req: %s, resp: %s", method, path, reqBody.String(), buf.String())
+		res.Body.Close()
+		if c.Debug {
+			fmt.Printf("%s: %s, req: %s, resp: %s\n", method, path, reqBody.String(), buf.String())
+		}
 	}()
 
 	if res.StatusCode > http.StatusCreated {
