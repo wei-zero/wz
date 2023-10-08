@@ -71,12 +71,17 @@ func newClientErrorFromResponse(statusCode int, body []byte) *Error {
 		ErrCode:    ErrCodeOk,
 		Message:    "",
 	}
+
 	if statusCode > http.StatusCreated {
 		err2 := json.Unmarshal(body, ce)
 		if err2 != nil {
-			ce.Message = err2.Error()
-			ce.ErrCode = ErrCodeBadResponseBody
+			ce.ErrCode = ErrCodeUnknown
+			ce.Message = string(body)
 			return ce
+		}
+
+		if ce.Message == "" {
+			ce.Message = string(body)
 		}
 	}
 

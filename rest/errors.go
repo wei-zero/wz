@@ -5,6 +5,7 @@ const (
 	ErrCodeNetwork         = "ErrNetwork"
 	ErrCodeInternalError   = "ErrInternalError"
 	ErrCodeBadResponseBody = "ErrBadResponseBody"
+	ErrCodeUnknown         = "Unknown"
 	ErrCodeOk              = "Ok"
 )
 
