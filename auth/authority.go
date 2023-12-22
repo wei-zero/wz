@@ -19,3 +19,8 @@ type Issuer interface {
 type Verifier interface {
 	Verify(token string) (*Identity, int64, error)
 }
+
+type Session struct {
+	Identity      *Identity
+	Authorization string
+}

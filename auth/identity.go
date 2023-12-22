@@ -6,3 +6,12 @@ type Identity struct {
 	DeviceID string
 	Internal string // internal source
 }
+
+func (i *Identity) IsAdmin() bool {
+	for _, role := range i.Roles {
+		if role == "admin" {
+			return true
+		}
+	}
+	return false
+}
