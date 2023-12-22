@@ -2,6 +2,10 @@ package auth
 
 import "time"
 
+const (
+	AuthorityName = "Authority"
+)
+
 // Authority is the interface that issue and verify token.
 type Authority interface {
 	Issuer
