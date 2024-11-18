@@ -45,3 +45,11 @@ func (m *Ticker) String() string {
 	}
 	return buffer.String()
 }
+
+func (m *Ticker) StringNano() string {
+	var buffer bytes.Buffer
+	for i := 1; i < len(m.ticks); i++ {
+		buffer.WriteString(fmt.Sprintf("%s: %dns ", m.ticks[i].msg, (m.ticks[i].time - m.ticks[i-1].time)))
+	}
+	return buffer.String()
+}
